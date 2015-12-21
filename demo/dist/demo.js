@@ -104,6 +104,8 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Created by Aaron on 12/21/2015.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
 
+	var gh_pages_key = "6LfKmBMTAAAAAEEk10iOxbp11HWyhq1v_jGdyyOA";
+
 	var DemoApp = (function (_React$Component) {
 	    _inherits(DemoApp, _React$Component);
 
@@ -127,28 +129,28 @@
 	                null,
 	                'Explicit Rendering'
 	            ),
-	            React.createElement(_2.default, { id: 'demo_recaptcha', render: 'explicit', sitekey: '6Ldi-wcTAAAAAEAiAJ9bfHL3-SCdvD4xAxv0Wl-n' }),
+	            React.createElement(_2.default, { id: 'demo_recaptcha', render: 'explicit', sitekey: gh_pages_key }),
 	            React.createElement(
 	                'h3',
 	                null,
 	                'with dark theme'
 	            ),
 	            React.createElement(_2.default, { id: 'demo_recaptcha2', render: 'explicit', theme: 'dark',
-	                sitekey: '6Ldi-wcTAAAAAEAiAJ9bfHL3-SCdvD4xAxv0Wl-n' }),
+	                sitekey: gh_pages_key }),
 	            React.createElement(
 	                'h3',
 	                null,
 	                'with compact size'
 	            ),
 	            React.createElement(_2.default, { id: 'demo_recaptcha3', render: 'explicit', size: 'compact',
-	                sitekey: '6Ldi-wcTAAAAAEAiAJ9bfHL3-SCdvD4xAxv0Wl-n' }),
+	                sitekey: gh_pages_key }),
 	            React.createElement(
 	                'h3',
 	                null,
 	                'with audio type (may not display differently)'
 	            ),
 	            React.createElement(_2.default, { id: 'demo_recaptcha4', render: 'explicit', type: 'audio',
-	                sitekey: '6Ldi-wcTAAAAAEAiAJ9bfHL3-SCdvD4xAxv0Wl-n' })
+	                sitekey: gh_pages_key })
 	        );
 	    };
 
