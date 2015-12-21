@@ -10,7 +10,7 @@ class DemoApp extends React.Component {
     render() {
         return (
             <div>
-                <h1>reCAPTCHA.jsx Demo App</h1>
+                <h1>react-recaptcha2 Demo App</h1>
 
                 <h3>Explicit Rendering</h3>
                 <ReCaptcha id="demo_recaptcha" render="explicit" sitekey="6Ldi-wcTAAAAAEAiAJ9bfHL3-SCdvD4xAxv0Wl-n"/>

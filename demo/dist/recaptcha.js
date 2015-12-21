@@ -120,7 +120,7 @@
 	            React.createElement(
 	                'h1',
 	                null,
-	                'reCAPTCHA.jsx Demo App'
+	                'react-recaptcha2 Demo App'
 	            ),
 	            React.createElement(
 	                'h3',
