@@ -6,7 +6,7 @@ module.exports = {
     entry:     "./demo/src/main.jsx",
     output:    {
         path:     __dirname + "/demo/dist/",
-        filename: "recaptcha.js"
+        filename: "demo.js"
     },
     module:    {
         loaders: [
