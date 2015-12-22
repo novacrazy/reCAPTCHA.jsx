@@ -59,19 +59,14 @@ var ReCaptcha = (function (_React$Component) {
             widget_id: null
         }, _temp), _possibleConstructorReturn(_this, _ret);
     }
+
     //Made static to the ReCaptcha component so it can be changed
 
-    ReCaptcha.prototype.componentWillMount = function componentWillMount() {
-        var _props = this.props;
-        var id = _props.id;
-        var onVerifyCallbackName = _props.onVerifyCallbackName;
-        var onExpiredCallbackName = _props.onExpiredCallbackName;
+    //Also made static so they can be changed
 
-        this.setState({
-            onVerifyCallbackName: onVerifyCallbackName + id,
-            onExpiredCallbackName: onExpiredCallbackName + id
-        });
-    };
+    /*
+     * This is just a very simpler script loader, and can be overriden by a better one if needed
+     * */
 
     ReCaptcha.prototype.loadScript = function loadScript() {
         var options = arguments.length <= 0 || arguments[0] === void 0 ? {} : arguments[0];
@@ -152,15 +147,15 @@ var ReCaptcha = (function (_React$Component) {
     };
 
     ReCaptcha.prototype.onLoad = function onLoad() {
-        var _props2 = this.props;
-        var id = _props2.id;
-        var sitekey = _props2.sitekey;
-        var onVerify = _props2.onVerify;
-        var onLoad = _props2.onLoad;
-        var theme = _props2.theme;
-        var type = _props2.type;
-        var size = _props2.size;
-        var tabindex = _props2.tabindex;
+        var _props = this.props;
+        var id = _props.id;
+        var sitekey = _props.sitekey;
+        var onVerify = _props.onVerify;
+        var onLoad = _props.onLoad;
+        var theme = _props.theme;
+        var type = _props.type;
+        var size = _props.size;
+        var tabindex = _props.tabindex;
         var _window = window;
         var grecaptcha = _window.grecaptcha;
 
@@ -186,6 +181,7 @@ var ReCaptcha = (function (_React$Component) {
             onLoad();
         }
 
+        ReCaptcha.loaded = true;
         ReCaptcha.loading = false;
     };
 
@@ -208,13 +204,9 @@ var ReCaptcha = (function (_React$Component) {
     ReCaptcha.prototype.componentDidMount = function componentDidMount() {
         var _this2 = this;
 
-        var _props3 = this.props;
-        var id = _props3.id;
-        var render = _props3.render;
-        var onLoadCallbackName = _props3.onLoadCallbackName;
-        var _state = this.state;
-        var onVerifyCallbackName = _state.onVerifyCallbackName;
-        var onExpiredCallbackName = _state.onExpiredCallbackName;
+        var _props2 = this.props;
+        var id = _props2.id;
+        var render = _props2.render;
 
         var src = ReCaptcha.API_URL;
 
@@ -223,7 +215,7 @@ var ReCaptcha = (function (_React$Component) {
                 return this.onLoad();
             }
 
-            var onLoadCallback = window[onLoadCallbackName];
+            var onLoadCallback = window[ReCaptcha.onLoadCallbackName];
 
             if (typeof onLoadCallback === 'function') {
                 (function () {
@@ -239,26 +231,22 @@ var ReCaptcha = (function (_React$Component) {
                 onLoadCallback = this.onLoad.bind(this);
             }
 
-            window[onLoadCallbackName] = onLoadCallback;
+            window[ReCaptcha.onLoadCallbackName] = onLoadCallback;
 
-            src += '?onload=' + onLoadCallbackName + '&render=explicit';
+            src += '?onload=' + ReCaptcha.onLoadCallbackName + '&render=explicit';
         } else {
             if (ReCaptcha.loading || ReCaptcha.loaded) {
                 throw new Error('Only one ReCaptcha instance can be used with onLoad rendering');
             }
 
-            window[onVerifyCallbackName] = this.onVerify.bind(this);
-            window[onExpiredCallbackName] = this.onExpired.bind(this);
+            window[ReCaptcha.onVerifyCallbackName] = this.onVerify.bind(this);
+            window[ReCaptcha.onExpiredCallbackName] = this.onExpired.bind(this);
         }
+
         if (!ReCaptcha.loading) {
             ReCaptcha.loading = true;
 
-            this.loadScript({
-                src: src,
-                onLoad: function onLoad() {
-                    ReCaptcha.loaded = true;
-                }
-            });
+            this.loadScript({ src: src });
         }
     };
 
@@ -267,13 +255,10 @@ var ReCaptcha = (function (_React$Component) {
     };
 
     ReCaptcha.prototype.render = function render() {
-        var _props4 = this.props;
-        var id = _props4.id;
-        var render = _props4.render;
-        var noscriptText = _props4.noscriptText;
-        var _state2 = this.state;
-        var onVerifyCallbackName = _state2.onVerifyCallbackName;
-        var onExpiredCallbackName = _state2.onExpiredCallbackName;
+        var _props3 = this.props;
+        var id = _props3.id;
+        var render = _props3.render;
+        var noscriptText = _props3.noscriptText;
 
         if (render === 'explicit') {
             return React.createElement(
@@ -287,16 +272,16 @@ var ReCaptcha = (function (_React$Component) {
                     React.createElement('br', null)
                 ) : '',
                 React.createElement('div', { id: id, className: 'g-recaptcha',
-                    'data-callback': onVerifyCallbackName,
-                    'data-expired-callback': onExpiredCallbackName })
+                    'data-callback': ReCaptcha.onVerifyCallbackName,
+                    'data-expired-callback': ReCaptcha.onExpiredCallbackName })
             );
         } else {
-            var _props5 = this.props;
-            var sitekey = _props5.sitekey;
-            var theme = _props5.theme;
-            var type = _props5.type;
-            var size = _props5.size;
-            var tabindex = _props5.tabindex;
+            var _props4 = this.props;
+            var sitekey = _props4.sitekey;
+            var theme = _props4.theme;
+            var type = _props4.type;
+            var size = _props4.size;
+            var tabindex = _props4.tabindex;
 
             return React.createElement(
                 'span',
@@ -309,8 +294,8 @@ var ReCaptcha = (function (_React$Component) {
                     React.createElement('br', null)
                 ) : '',
                 React.createElement('div', { id: id, className: 'g-recaptcha',
-                    'data-callback': onVerifyCallbackName,
-                    'data-expired-callback': onExpiredCallbackName,
+                    'data-callback': ReCaptcha.onVerifyCallbackName,
+                    'data-expired-callback': ReCaptcha.onExpiredCallbackName,
                     'data-sitekey': sitekey,
                     'data-theme': theme,
                     'data-type': type,
@@ -323,14 +308,14 @@ var ReCaptcha = (function (_React$Component) {
     return ReCaptcha;
 })(React.Component);
 
-ReCaptcha.API_URL = 'https://www.google.com/recaptcha/api.js';
 ReCaptcha.displayName = 'ReCaptcha';
+ReCaptcha.API_URL = 'https://www.google.com/recaptcha/api.js';
+ReCaptcha.onLoadCallbackName = 'onReCaptchaLoadCallback';
+ReCaptcha.onVerifyCallbackName = 'onReCaptchaVerifyCallback';
+ReCaptcha.onExpiredCallbackName = 'onReCaptchaExpiredCallback';
 ReCaptcha.propTypes = {
-    onLoadCallbackName: React.PropTypes.string,
     onLoad: React.PropTypes.func,
-    onVerifyCallbackName: React.PropTypes.string,
     onVerify: React.PropTypes.func,
-    onExpiredCallbackName: React.PropTypes.string,
     onExpired: React.PropTypes.func,
     id: React.PropTypes.string.isRequired,
     sitekey: React.PropTypes.string.isRequired,
@@ -342,9 +327,6 @@ ReCaptcha.propTypes = {
     noscriptText: React.PropTypes.node
 };
 ReCaptcha.defaultProps = {
-    onLoadCallbackName: 'onReCaptchaLoadCallback',
-    onVerifyCallbackName: 'onReCaptchaVerifyCallback',
-    onExpiredCallbackName: 'onReCaptchaExpiredCallback',
     theme: 'light',
     type: 'image',
     render: 'onLoad',
