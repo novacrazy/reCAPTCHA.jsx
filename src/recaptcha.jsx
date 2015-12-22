@@ -5,38 +5,37 @@
 import * as React from 'react';
 
 class ReCaptcha extends React.Component {
+    static displayName = 'ReCaptcha';
+
     //Made static to the ReCaptcha component so it can be changed
     static API_URL = 'https://www.google.com/recaptcha/api.js';
 
-    static displayName = 'ReCaptcha';
+    //Also made static so they can be changed
+    static onLoadCallbackName = 'onReCaptchaLoadCallback';
+    static onVerifyCallbackName = 'onReCaptchaVerifyCallback';
+    static onExpiredCallbackName = 'onReCaptchaExpiredCallback';
 
     static propTypes = {
-        onLoadCallbackName:    React.PropTypes.string,
-        onLoad:                React.PropTypes.func,
-        onVerifyCallbackName:  React.PropTypes.string,
-        onVerify:              React.PropTypes.func,
-        onExpiredCallbackName: React.PropTypes.string,
-        onExpired:             React.PropTypes.func,
-        id:                    React.PropTypes.string.isRequired,
-        sitekey:               React.PropTypes.string.isRequired,
-        theme:                 React.PropTypes.oneOf( ['light', 'dark'] ),
-        type:                  React.PropTypes.oneOf( ['image', 'audio'] ),
-        render:                React.PropTypes.oneOf( ['explicit', 'onLoad'] ),
-        size:                  React.PropTypes.oneOf( ['compact', 'normal'] ),
-        tabindex:              React.PropTypes.number,
-        noscriptText:          React.PropTypes.node
+        onLoad:       React.PropTypes.func,
+        onVerify:     React.PropTypes.func,
+        onExpired:    React.PropTypes.func,
+        id:           React.PropTypes.string.isRequired,
+        sitekey:      React.PropTypes.string.isRequired,
+        theme:        React.PropTypes.oneOf( ['light', 'dark'] ),
+        type:         React.PropTypes.oneOf( ['image', 'audio'] ),
+        render:       React.PropTypes.oneOf( ['explicit', 'onLoad'] ),
+        size:         React.PropTypes.oneOf( ['compact', 'normal'] ),
+        tabindex:     React.PropTypes.number,
+        noscriptText: React.PropTypes.node
     };
 
     static defaultProps = {
-        onLoadCallbackName:    'onReCaptchaLoadCallback',
-        onVerifyCallbackName:  'onReCaptchaVerifyCallback',
-        onExpiredCallbackName: 'onReCaptchaExpiredCallback',
-        theme:                 'light',
-        type:                  'image',
-        render:                'onLoad',
-        size:                  'normal',
-        tabindex:              0,
-        noscriptText:          "You have JavaScript disabled and will be unable to verify your identity through reCAPTCHA."
+        theme:        'light',
+        type:         'image',
+        render:       'onLoad',
+        size:         'normal',
+        tabindex:     0,
+        noscriptText: "You have JavaScript disabled and will be unable to verify your identity through reCAPTCHA."
     };
 
     static loaded = false;
@@ -48,15 +47,9 @@ class ReCaptcha extends React.Component {
         widget_id: null
     };
 
-    componentWillMount() {
-        const {id, onVerifyCallbackName, onExpiredCallbackName} = this.props;
-
-        this.setState( {
-            onVerifyCallbackName:  onVerifyCallbackName + id,
-            onExpiredCallbackName: onExpiredCallbackName + id
-        } );
-    }
-
+    /*
+     * This is just a very simpler script loader, and can be overriden by a better one if needed
+     * */
     loadScript( options = {} ) {
         const self = this;
 
@@ -153,6 +146,7 @@ class ReCaptcha extends React.Component {
             onLoad();
         }
 
+        ReCaptcha.loaded = true;
         ReCaptcha.loading = false;
     }
 
@@ -171,8 +165,7 @@ class ReCaptcha extends React.Component {
     }
 
     componentDidMount() {
-        const {id, render, onLoadCallbackName} = this.props;
-        const {onVerifyCallbackName, onExpiredCallbackName} = this.state;
+        const {id, render} = this.props;
 
         let src = ReCaptcha.API_URL;
 
@@ -181,7 +174,7 @@ class ReCaptcha extends React.Component {
                 return this.onLoad();
             }
 
-            let onLoadCallback = window[onLoadCallbackName];
+            let onLoadCallback = window[ReCaptcha.onLoadCallbackName];
 
             if( typeof onLoadCallback === 'function' ) {
                 let oldOnLoadCallback = onLoadCallback;
@@ -196,27 +189,23 @@ class ReCaptcha extends React.Component {
                 onLoadCallback = this.onLoad.bind( this );
             }
 
-            window[onLoadCallbackName] = onLoadCallback;
+            window[ReCaptcha.onLoadCallbackName] = onLoadCallback;
 
-            src += `?onload=${onLoadCallbackName}&render=explicit`;
+            src += `?onload=${ReCaptcha.onLoadCallbackName}&render=explicit`;
 
         } else {
             if( ReCaptcha.loading || ReCaptcha.loaded ) {
                 throw new Error( 'Only one ReCaptcha instance can be used with onLoad rendering' );
             }
 
-            window[onVerifyCallbackName] = this.onVerify.bind( this );
-            window[onExpiredCallbackName] = this.onExpired.bind( this );
+            window[ReCaptcha.onVerifyCallbackName] = this.onVerify.bind( this );
+            window[ReCaptcha.onExpiredCallbackName] = this.onExpired.bind( this );
         }
+
         if( !ReCaptcha.loading ) {
             ReCaptcha.loading = true;
 
-            this.loadScript( {
-                        src,
-                onLoad: () => {
-                    ReCaptcha.loaded = true;
-                }
-            } );
+            this.loadScript( {src} );
         }
     }
 
@@ -226,7 +215,6 @@ class ReCaptcha extends React.Component {
 
     render() {
         const {id, render, noscriptText} = this.props;
-        const {onVerifyCallbackName, onExpiredCallbackName} = this.state;
 
         if( render === 'explicit' ) {
             return (
@@ -234,8 +222,8 @@ class ReCaptcha extends React.Component {
                     {!!noscriptText ? (<noscript><br/>{noscriptText}<br/></noscript>) : ''}
 
                     <div id={id} className="g-recaptcha"
-                         data-callback={onVerifyCallbackName}
-                         data-expired-callback={onExpiredCallbackName}></div>
+                         data-callback={ReCaptcha.onVerifyCallbackName}
+                         data-expired-callback={ReCaptcha.onExpiredCallbackName}></div>
                 </div>
             );
 
@@ -247,8 +235,8 @@ class ReCaptcha extends React.Component {
                     {!!noscriptText ? (<noscript><br/>{noscriptText}<br/></noscript>) : ''}
 
                     <div id={id} className='g-recaptcha'
-                         data-callback={onVerifyCallbackName}
-                         data-expired-callback={onExpiredCallbackName}
+                         data-callback={ReCaptcha.onVerifyCallbackName}
+                         data-expired-callback={ReCaptcha.onExpiredCallbackName}
                          data-sitekey={sitekey}
                          data-theme={theme}
                          data-type={type}
